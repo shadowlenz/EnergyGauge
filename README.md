@@ -16,6 +16,8 @@ Free to use. Please mention my name "Eugene Chu" Twitter: @LenZ_Chu if you can ;
 https://twitter.com/LenZ_Chu
 
 
-// public methods //
-   SetValueCurrent(int _current)
+// public methods // 
+
+   SetValueCurrent(int _current) 
+   
    SetValueMax(int _max)
