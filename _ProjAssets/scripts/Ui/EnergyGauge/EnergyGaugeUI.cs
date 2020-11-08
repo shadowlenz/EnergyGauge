@@ -1,7 +1,7 @@
 ﻿///written by: Eugene Chu
 ///https://twitter.com/LenZ_Chu
 ///free to use. please credit
-//v.5.0
+//v.5.1
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

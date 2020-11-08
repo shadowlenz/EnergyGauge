@@ -21,7 +21,7 @@ public class EnergyGaugeUIEditor : Editor
             }
             */
             CheckUpdates();
-            HideGos();
+            HideGos(showDebug);
         }
 
     }
@@ -38,7 +38,7 @@ public class EnergyGaugeUIEditor : Editor
         showDebug = GUILayout.Toggle(showDebug, "show debug");
         if (EditorGUI.EndChangeCheck())
         {
-            HideGos();
+            HideGos(showDebug);
         }
         GUILayout.Space(20);
         EditorGUI.BeginChangeCheck();
@@ -119,42 +119,44 @@ public class EnergyGaugeUIEditor : Editor
                 if (mask_p.objectReferenceValue != null)
                 {
                     DestroyGo(((Image)mask_p.objectReferenceValue).gameObject);
+                    serializedObject.ApplyModifiedProperties();
                 }
 
                 SerializedProperty img_p = barSets_p.GetArrayElementAtIndex(id).FindPropertyRelative("img");
                 if (img_p.objectReferenceValue != null)
                 {
                     DestroyGo(((Image)img_p.objectReferenceValue).gameObject);
+                    serializedObject.ApplyModifiedProperties();
                 }
 
                 SerializedProperty requiredImg_p = barSets_p.GetArrayElementAtIndex(id).FindPropertyRelative("requiredImg");
                 if (requiredImg_p.objectReferenceValue != null)
                 {
                     DestroyGo(((Image)requiredImg_p.objectReferenceValue).gameObject);
+                    serializedObject.ApplyModifiedProperties();
                 }
                 SerializedProperty requiredMask_p = barSets_p.GetArrayElementAtIndex(id).FindPropertyRelative("requiredMask");
                 if (requiredMask_p.objectReferenceValue != null)
                 {
                     DestroyGo(((Image)requiredMask_p.objectReferenceValue).gameObject);
+                    serializedObject.ApplyModifiedProperties();
                 }
 
                 SerializedProperty bleedImg_p = barSets_p.GetArrayElementAtIndex(id).FindPropertyRelative("bleedImg");
                 if (bleedImg_p.objectReferenceValue != null)
                 {
                     DestroyGo(((Image)bleedImg_p.objectReferenceValue).gameObject);
+                    serializedObject.ApplyModifiedProperties();
                 }
 ;
                 barSets_p.DeleteArrayElementAtIndex(barSets_p.arraySize - 1);
                 serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
 
                 CheckUpdates();
                 myTarget.MainGauge();
                 myTarget.RequiredGauge();
-                HideGos();
-
-                serializedObject.ApplyModifiedProperties();
-
-
+                HideGos(showDebug);
             }
         }
         GUI.enabled = true;
@@ -316,8 +318,6 @@ public class EnergyGaugeUIEditor : Editor
                 
 
 
-            if (myTarget.canRequired)
-            {
                 //mask
                 if (new_requiredMask_p.objectReferenceValue == null)
                 {
@@ -338,7 +338,7 @@ public class EnergyGaugeUIEditor : Editor
  
                 serializedObject.ApplyModifiedProperties();
               
-            }
+                }
                 //has
                 if (myTarget.maskImg != null)
                 {
@@ -379,18 +379,16 @@ public class EnergyGaugeUIEditor : Editor
                     //}
                 }
 
+            if (myTarget.canRequired)
+            {
+                ((Image)new_requiredMask_p.objectReferenceValue).enabled = true;
+                ((Image)new_required_p.objectReferenceValue).enabled = true;
             }
-                else
-                {
-                    if (myTarget.barSets[i].requiredImg != null)
-                    {
-                        DestroyGo(myTarget.barSets[i].requiredImg.gameObject);
-                    }
-                    if (myTarget.barSets[i].requiredMask != null)
-                    {
-                        DestroyGo(myTarget.barSets[i].requiredMask.gameObject);
-                    }
-                }
+            else
+            {
+                ((Image)new_requiredMask_p.objectReferenceValue).enabled = false;
+                ((Image)new_required_p.objectReferenceValue).enabled = false;
+            }
 
                 if (myTarget.displayText != null || myTarget.displayTextTMP != null)
                 {
@@ -404,20 +402,31 @@ public class EnergyGaugeUIEditor : Editor
        
     }
     bool showDebug;
-    void HideGos()
+    void HideGos(bool show = false)
     {
-        for (int i = 0; i < myTarget.barSets.Count; i++)
+        if (show)
         {
-           if (myTarget.barSets[i].img) HideGO(myTarget.barSets[i].img.gameObject);
-            if (myTarget.barSets[i].mask) HideGO(myTarget.barSets[i].mask.gameObject);
-            if (myTarget.barSets[i].bleedImg) HideGO(myTarget.barSets[i].bleedImg.gameObject);
-            if (myTarget.barSets[i].requiredImg) HideGO(myTarget.barSets[i].requiredImg.gameObject);
-            if (myTarget.barSets[i].requiredMask) HideGO(myTarget.barSets[i].requiredMask.gameObject);
+            Transform[] _tr = myTarget.transform.GetComponentsInChildren<Transform>();
+            for (int i = 0; i < _tr.Length; i++)
+            {
+                if (_tr[i] != null && _tr[i] != myTarget.transform) _tr[i].gameObject.hideFlags = HideFlags.None;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < myTarget.barSets.Count; i++)
+            {
+                if (myTarget.barSets[i].img) HideGO(myTarget.barSets[i].img.gameObject);
+               if (myTarget.barSets[i].mask) HideGO(myTarget.barSets[i].mask.gameObject);
+              if (myTarget.barSets[i].bleedImg) HideGO(myTarget.barSets[i].bleedImg.gameObject);
+                if (myTarget.barSets[i].requiredImg) HideGO(myTarget.barSets[i].requiredImg.gameObject);
+                if (myTarget.barSets[i].requiredMask) HideGO(myTarget.barSets[i].requiredMask.gameObject);
+           }
         }
     }
     void HideGO(GameObject _go)
     {
-        
+       
         if (_go == null) return;
 
             GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(_go);
@@ -445,8 +454,21 @@ public class EnergyGaugeUIEditor : Editor
     }
     void DestroyGo(GameObject _go)
     {
+        
         GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(_go);
-        if (prefab != null) Undo.DestroyObjectImmediate(prefab);
+        if (prefab != null)
+        {
+            Debug.Log("destroy " + prefab.name);
+            Undo.DestroyObjectImmediate(prefab);
+        }
         else Undo.DestroyObjectImmediate(_go);
+        
+
+        /*
+        if (PrefabUtility.IsPartOfPrefabInstance(myTarget.transform))
+            PrefabUtility.UnpackPrefabInstance(myTarget.gameObject, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+
+        Undo.DestroyObjectImmediate(_go);
+        */
     }
 }
