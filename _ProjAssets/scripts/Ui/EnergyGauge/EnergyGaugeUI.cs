@@ -75,11 +75,15 @@ public class EnergyGaugeUI : MonoBehaviour
     [System.Serializable]
     public class BarSet
     {
+        [HideInInspector]
         public Image mask;
+        [HideInInspector]
         public Image img;
+        [HideInInspector]
         public Image requiredMask;
+        [HideInInspector]
         public Image requiredImg;
-
+        [HideInInspector]
         public Image bleedImg;
         [System.NonSerialized]
         public float bleedPercCheckPoint;

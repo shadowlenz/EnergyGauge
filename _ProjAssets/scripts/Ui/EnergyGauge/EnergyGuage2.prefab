@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7331341252458900042
+--- !u!1 &2012717287702908643
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,24 +8,24 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1006500720861654287}
-  - component: {fileID: 9133965429536172732}
-  - component: {fileID: 2948642684361709735}
+  - component: {fileID: 8333766669021809062}
+  - component: {fileID: 41357688085974549}
+  - component: {fileID: 6249621159550401550}
   m_Layer: 0
-  m_Name: EnergyGauge
+  m_Name: EnergyGuage2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &1006500720861654287
+--- !u!224 &8333766669021809062
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7331341252458900042}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_GameObject: {fileID: 2012717287702908643}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 23.6277}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -37,13 +37,13 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
---- !u!114 &9133965429536172732
+--- !u!114 &41357688085974549
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7331341252458900042}
+  m_GameObject: {fileID: 2012717287702908643}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f78df1c9a05301e498e0bd7409298400, type: 3}
@@ -111,17 +111,32 @@ MonoBehaviour:
   required: 25
   req_normalColor: {r: 1, g: 1, b: 1, a: 1}
   req_UnsufficentColor: {r: 1, g: 0, b: 0, a: 1}
-  barSets: []
+  barSets:
+  - mask: {fileID: 0}
+    img: {fileID: 0}
+    requiredMask: {fileID: 0}
+    requiredImg: {fileID: 0}
+    bleedImg: {fileID: 0}
+  - mask: {fileID: 0}
+    img: {fileID: 0}
+    requiredMask: {fileID: 0}
+    requiredImg: {fileID: 0}
+    bleedImg: {fileID: 0}
+  - mask: {fileID: 0}
+    img: {fileID: 0}
+    requiredMask: {fileID: 0}
+    requiredImg: {fileID: 0}
+    bleedImg: {fileID: 0}
   mask: {fileID: 0}
   img: {fileID: 0}
   requiredImg: {fileID: 0}
---- !u!114 &2948642684361709735
+--- !u!114 &6249621159550401550
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7331341252458900042}
+  m_GameObject: {fileID: 2012717287702908643}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}

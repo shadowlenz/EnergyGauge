@@ -13,12 +13,20 @@ public class EnergyGaugeUIEditor : Editor
         myTarget = (EnergyGaugeUI)target;
         if (!Application.isPlaying)
         {
-            LegacySetup();
+            // /  LegacySetup();
+
+            Transform[] _tr = myTarget.transform.GetComponentsInChildren<Transform>();
+            for (int i = 0; i < _tr.Length; i++)
+            {
+                if (_tr[i] != null && _tr[i] != myTarget.transform ) DestroyImmediate(_tr[i].gameObject);
+            }
+
             CheckUpdates();
             HideGos();
         }
 
     }
+
     public override void OnInspectorGUI()
     {
         myTarget = (EnergyGaugeUI)target;
@@ -31,6 +39,13 @@ public class EnergyGaugeUIEditor : Editor
         int preCurrent = serializedProperty_current.intValue;
         GUILayout.BeginHorizontal();
         preCurrent = EditorGUILayout.IntSlider(preCurrent, 0, serializedProperty_max.intValue);
+        if (EditorGUI.EndChangeCheck())
+        {
+            CheckUpdates();
+            // HideGos();
+            serializedProperty_current.intValue = preCurrent;
+        }
+        //serializedProperty_current.intValue = preCurrent;
         EditorGUILayout.LabelField(" / " + serializedProperty_max.intValue, GUILayout.Width(80));
         GUILayout.EndHorizontal();
 
@@ -63,10 +78,12 @@ public class EnergyGaugeUIEditor : Editor
 
                 serializedObject.ApplyModifiedProperties();
 
-                    CheckUpdates();
+                CheckUpdates();
                 myTarget.MainGauge();
                 myTarget.RequiredGauge();
                 HideGos();
+
+
             }
         }
         if (barSets_p.arraySize > 0) GUI.enabled = true;
@@ -119,6 +136,10 @@ public class EnergyGaugeUIEditor : Editor
                 myTarget.MainGauge();
                 myTarget.RequiredGauge();
                 HideGos();
+
+                serializedObject.ApplyModifiedProperties();
+
+
             }
         }
         GUI.enabled = true;
@@ -131,17 +152,16 @@ public class EnergyGaugeUIEditor : Editor
 
           base.OnInspectorGUI();
 
-        if (EditorGUI.EndChangeCheck())
-        {
-            HideGos();
-            serializedProperty_current.intValue = preCurrent;
-        }
+
+
+
         myTarget.MainGauge();
         myTarget.RequiredGauge();
 
         serializedObject.ApplyModifiedProperties();
+
     }
-    void LegacySetup()
+   /* void LegacySetup()
     {
         SerializedObject serializedObject = new SerializedObject(target);
         SerializedProperty barSets_p = serializedObject.FindProperty("barSets");
@@ -176,7 +196,7 @@ public class EnergyGaugeUIEditor : Editor
         //------------------------------------
 
         serializedObject.ApplyModifiedProperties();
-    }
+    }*/
     void CheckUpdates()
     {
         SerializedObject serializedObject = new SerializedObject(target);
@@ -187,16 +207,20 @@ public class EnergyGaugeUIEditor : Editor
 
         for (int i = 0; i < myTarget.barSets.Count; i++)
         {
+
+            serializedObject.Update();
             SerializedProperty new_mask_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("mask");
             SerializedProperty new_img_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("img");
             SerializedProperty new_requiredMask_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("requiredMask");
             SerializedProperty new_required_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("requiredImg");
+
 
             if (new_mask_p.objectReferenceValue == null) //mask
             {
                 serializedObject.Update();
                 GameObject _mask = new GameObject("Mask_" + i);
                 //_mask.transform.SetParent(myTarget.transform);
+                HideGO(_mask);
                 ParentGo(_mask.gameObject , myTarget.gameObject);
 
                 Image _maskImg = _mask.AddComponent<Image>();
@@ -206,107 +230,141 @@ public class EnergyGaugeUIEditor : Editor
                 //myTarget.barSets[i].mask = _maskImg;
                 new_mask_p.objectReferenceValue = _maskImg;
 
-                Undo.RegisterCreatedObjectUndo(_mask, "create GO");
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.Update();
-                // Undo.RecordObject(target, "Setup");
+                Debug.Log("making mask");
             }
 
-                if (myTarget.showMask)
+            if (myTarget.showMask)
                 {
-                    myTarget.barSets[i].mask.enabled = true;
-                    if (myTarget.maskImg != null) ((Image)new_mask_p.objectReferenceValue).sprite = myTarget.maskImg;
+                if (!((Image)new_mask_p.objectReferenceValue).enabled)
+                {
+                    ((Image)new_mask_p.objectReferenceValue).enabled = true;
                     ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = myTarget.showMaskGraphic;
-                    //myTarget.barSets[i].mask.enabled = true;
-                    // if (myTarget.maskImg != null) myTarget.barSets[i].mask.sprite = myTarget.maskImg;
-                    // myTarget.barSets[i].mask.GetComponent<Mask>().showMaskGraphic = myTarget.showMaskGraphic;
 
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
                 }
-                else
+                if (myTarget.maskImg != null)
                 {
-                    if (((Image)new_mask_p.objectReferenceValue).enabled)
+                    if (((Image)new_mask_p.objectReferenceValue).sprite != myTarget.maskImg)
                     {
-                        ((Image)new_mask_p.objectReferenceValue).enabled = false;
-                        if (myTarget.maskImg != null) ((Image)new_mask_p.objectReferenceValue).sprite = null;
-                        ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = false;
-                        // myTarget.barSets[i].mask.enabled = false;
-                        // myTarget.barSets[i].mask.sprite = null;
-                        //myTarget.barSets[i].mask.GetComponent<Mask>().showMaskGraphic = false;
+                        ((Image)new_mask_p.objectReferenceValue).sprite = myTarget.maskImg;
+                        serializedObject.ApplyModifiedProperties();
+                        serializedObject.Update();
                     }
                 }
-            
+            }
+            else
+            {
+                if (((Image)new_mask_p.objectReferenceValue).enabled)
+                {
+                    ((Image)new_mask_p.objectReferenceValue).enabled = false;
+                    if (myTarget.maskImg != null) ((Image)new_mask_p.objectReferenceValue).sprite = null;
+                    ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = false;
+
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                }
+                    
+            }
+
 
             if (new_img_p.objectReferenceValue == null) //img bar
                 {
                 serializedObject.Update();
                // Debug.Log("create main guage");
                     GameObject _gauge = new GameObject("mainGauge_" + i);
-
-                    ParentGo(_gauge.gameObject, myTarget.barSets[i].mask.gameObject);
+                HideGO(_gauge);
+                ParentGo(_gauge.gameObject, myTarget.barSets[i].mask.gameObject);
                    // _gauge.transform.SetParent(myTarget.barSets[i].mask.transform);
                     Image _img = _gauge.AddComponent<Image>();
 
                     //myTarget.barSets[i].img = _img;
                     new_img_p.objectReferenceValue = _img;
 
-                    Undo.RegisterCreatedObjectUndo(_gauge, "create GO");
+                    //Undo.RegisterCreatedObjectUndo(_gauge, "create GO");
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.Update();
             }
 
-                    if (myTarget.barImg != null) ((Image)new_img_p.objectReferenceValue).sprite = myTarget.barImg;
+            if (myTarget.barImg != null)
+            {
+                if (((Image)new_img_p.objectReferenceValue).sprite != myTarget.barImg)
+                {
+                    ((Image)new_img_p.objectReferenceValue).sprite = myTarget.barImg;
+
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                }
+            }
                 
 
 
-                if (myTarget.canRequired)
+            if (myTarget.canRequired)
+            {
+                //mask
+                if (new_requiredMask_p.objectReferenceValue == null)
                 {
-                    //mask
-                    if (new_requiredMask_p.objectReferenceValue == null)
+                serializedObject.Update();
+                GameObject _mask = new GameObject("RequiredMask_" + i);
+                    HideGO(_mask);
+                    ParentGo(_mask.gameObject, myTarget.barSets[i].mask.gameObject);
+                // _mask.transform.SetParent(myTarget.barSets[i].mask.transform);
+
+                Image _maskImg = _mask.AddComponent<Image>();
+                Mask _mc = _mask.AddComponent<Mask>();
+                _mc.showMaskGraphic = false;
+
+                //myTarget.barSets[i].requiredMask = _maskImg;
+                new_requiredMask_p.objectReferenceValue = _maskImg;
+
+               // Undo.RegisterCreatedObjectUndo(_mask, "create GO");
+ 
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
+            }
+                //has
+                if (myTarget.maskImg != null)
+                {
+                    if (((Image)new_requiredMask_p.objectReferenceValue).sprite != myTarget.maskImg)
                     {
-                    serializedObject.Update();
-                    GameObject _mask = new GameObject("RequiredMask_" + i);
-    
-                        ParentGo(_mask.gameObject, myTarget.barSets[i].mask.gameObject);
-                       // _mask.transform.SetParent(myTarget.barSets[i].mask.transform);
+                        ((Image)new_requiredMask_p.objectReferenceValue).sprite = myTarget.maskImg;                    //myTarget.barSets[i].requiredMask.sprite = myTarget.barSets[i].img.sprite;
 
-                        Image _maskImg = _mask.AddComponent<Image>();
-                        Mask _mc = _mask.AddComponent<Mask>();
-                        _mc.showMaskGraphic = false;
-
-                        //myTarget.barSets[i].requiredMask = _maskImg;
-                        new_requiredMask_p.objectReferenceValue = _maskImg;
-
-                        Undo.RegisterCreatedObjectUndo(_mask, "create GO");
-                    //     Undo.RecordObject(target, "Setup");
-                    serializedObject.ApplyModifiedProperties();
-                    serializedObject.Update();
+                        serializedObject.ApplyModifiedProperties();
+                        serializedObject.Update();
+                    }
                 }
-                        //has
-                        ((Image)new_requiredMask_p.objectReferenceValue).sprite = myTarget.maskImg;
-                        //myTarget.barSets[i].requiredMask.sprite = myTarget.barSets[i].img.sprite;
 
-                    //guage
-                    if (new_required_p.objectReferenceValue == null)
-                    {
+                //guage
+                if (new_required_p.objectReferenceValue == null)
+                {
                     serializedObject.Update();
                     Image requiredImg = Instantiate((Image)new_img_p.objectReferenceValue, ((Image)new_requiredMask_p.objectReferenceValue).transform);
-                        requiredImg.name = "Required_" + i;
+                    requiredImg.name = "Required_" + i;
+                    HideGO(requiredImg.gameObject);
+                    ParentGo(requiredImg.gameObject, ((Image)new_requiredMask_p.objectReferenceValue).gameObject);
+                    //requiredImg.transform.SetParent(((Image)new_requiredMask_p.objectReferenceValue).transform);
 
-                        ParentGo(requiredImg.gameObject, ((Image)new_requiredMask_p.objectReferenceValue).gameObject);
-                        //requiredImg.transform.SetParent(((Image)new_requiredMask_p.objectReferenceValue).transform);
+                    new_required_p.objectReferenceValue = requiredImg;
 
-                        new_required_p.objectReferenceValue = requiredImg;
-                        Undo.RegisterCreatedObjectUndo(requiredImg, "create GO");
-                    serializedObject.ApplyModifiedProperties();
-                    serializedObject.Update();
+                    //Undo.RegisterCreatedObjectUndo(requiredImg, "create GO");
+                        serializedObject.ApplyModifiedProperties();
+                        serializedObject.Update();
                 }
-                        //has
+                //has
+                if (myTarget.barImg != null)
+                {
+                    if (((Image)new_required_p.objectReferenceValue).sprite != myTarget.barImg)
+                    {
                         ((Image)new_required_p.objectReferenceValue).sprite = myTarget.barImg;
-                        ((Image)new_required_p.objectReferenceValue).transform.SetParent(((Image)new_requiredMask_p.objectReferenceValue).transform);
-                        //myTarget.barSets[i].requiredImg.sprite = myTarget.barSets[i].img.sprite;
-                        // myTarget.barSets[i].requiredImg.transform.SetParent(    ((Image)new_requiredMask_p.objectReferenceValue).transform  );
 
+                        serializedObject.ApplyModifiedProperties();
+                        serializedObject.Update();
+                    }
                 }
+
+            }
                 else
                 {
                     if (myTarget.barSets[i].requiredImg != null)
@@ -323,7 +381,7 @@ public class EnergyGaugeUIEditor : Editor
                 {
                     myTarget.DisplayLogic();
                 }
-            
+
         }
         myTarget.ConsistentPosSize();
 
