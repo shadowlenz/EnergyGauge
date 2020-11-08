@@ -41,10 +41,10 @@ public class EnergyGaugeUIEditor : Editor
             HideGos(showDebug);
         }
         GUILayout.Space(20);
-        EditorGUI.BeginChangeCheck();
-
-        int preCurrent = serializedProperty_current.intValue;
         GUILayout.BeginHorizontal();
+
+        EditorGUI.BeginChangeCheck();
+        int preCurrent = serializedProperty_current.intValue;
         preCurrent = EditorGUILayout.IntSlider(preCurrent, 0, serializedProperty_max.intValue);
 
         if (EditorGUI.EndChangeCheck())
@@ -52,11 +52,11 @@ public class EnergyGaugeUIEditor : Editor
             serializedProperty_current.intValue = preCurrent;
         }
 
-
         //call this if inspector changed
 
         CheckUpdates();
-
+        myTarget.MainGauge();
+        myTarget.RequiredGauge();
 
 
 
@@ -171,11 +171,10 @@ public class EnergyGaugeUIEditor : Editor
 
 
 
-        myTarget.MainGauge();
-        myTarget.RequiredGauge();
+
 
         serializedObject.ApplyModifiedProperties();
-
+        serializedObject.Update();
     }
    /* void LegacySetup()
     {
