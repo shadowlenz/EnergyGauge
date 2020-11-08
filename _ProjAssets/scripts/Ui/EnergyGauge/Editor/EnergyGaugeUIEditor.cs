@@ -251,39 +251,20 @@ public class EnergyGaugeUIEditor : Editor
                 Debug.Log("making mask");
             }
 
-            if (myTarget.showMask)
-                {
-               // if (!((Image)new_mask_p.objectReferenceValue).enabled)
-               // {
-                    ((Image)new_mask_p.objectReferenceValue).enabled = true;
-                    ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = myTarget.showMaskGraphic;
+            ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().enabled = myTarget.showMask;
+            ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = myTarget.showMaskGraphic;
 
-                    serializedObject.ApplyModifiedProperties();
-             
-                //}
-                if (myTarget.maskImg != null)
-                //{
-                    if (((Image)new_mask_p.objectReferenceValue).sprite != myTarget.maskImg)
-                    {
-                        ((Image)new_mask_p.objectReferenceValue).sprite = myTarget.maskImg;
-                        serializedObject.ApplyModifiedProperties();
-                        
-                    }
-               // }
-            }
-            else
+            serializedObject.ApplyModifiedProperties();
+
+            // if (myTarget.maskImg != null)
+            //    {
+            if (((Image)new_mask_p.objectReferenceValue).sprite != myTarget.maskImg)
             {
-                if (((Image)new_mask_p.objectReferenceValue).enabled)
-                {
-                    ((Image)new_mask_p.objectReferenceValue).enabled = false;
-                    if (myTarget.maskImg != null) ((Image)new_mask_p.objectReferenceValue).sprite = null;
-                    ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = false;
+                ((Image)new_mask_p.objectReferenceValue).sprite = myTarget.maskImg;
+                serializedObject.ApplyModifiedProperties();
 
-                    serializedObject.ApplyModifiedProperties();
-                   
-                }
-                    
             }
+            // }
 
 
             if (new_img_p.objectReferenceValue == null) //img bar
