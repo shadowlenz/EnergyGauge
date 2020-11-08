@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1006500720861654287}
   - component: {fileID: 9133965429536172732}
   - component: {fileID: 2948642684361709735}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: EnergyGauge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +26,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7331341252458900042}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 23.6277}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -105,13 +105,18 @@ MonoBehaviour:
   canBleed: 1
   bleedColor: {r: 1, g: 0, b: 0, a: 0.46666667}
   bleedPause: 0.1
-  canRequired: 1
+  canRequired: 0
   keepRequiredMaxOfCurrent: 1
   behindAhead: 1
   required: 25
   req_normalColor: {r: 1, g: 1, b: 1, a: 0.15686275}
   req_UnsufficentColor: {r: 1, g: 0, b: 0, a: 1}
   barSets:
+  - mask: {fileID: 0}
+    img: {fileID: 0}
+    requiredMask: {fileID: 0}
+    requiredImg: {fileID: 0}
+    bleedImg: {fileID: 0}
   - mask: {fileID: 0}
     img: {fileID: 0}
     requiredMask: {fileID: 0}

@@ -8,13 +8,16 @@ using UnityEditor;
 public class EnergyGaugeUIEditor : Editor
 {
     EnergyGaugeUI myTarget;
-  
     public void OnEnable()
     {
+        myTarget = (EnergyGaugeUI)target;
         if (!Application.isPlaying)
         {
             LegacySetup();
+            CheckUpdates();
+            HideGos();
         }
+
     }
     public override void OnInspectorGUI()
     {
@@ -30,18 +33,7 @@ public class EnergyGaugeUIEditor : Editor
         preCurrent = EditorGUILayout.IntSlider(preCurrent, 0, serializedProperty_max.intValue);
         EditorGUILayout.LabelField(" / " + serializedProperty_max.intValue, GUILayout.Width(80));
         GUILayout.EndHorizontal();
-       if (EditorGUI.EndChangeCheck())
-        {
-           serializedProperty_current.intValue = preCurrent;
-        }
-        serializedObject.ApplyModifiedProperties();
 
-        if (!Application.isPlaying)
-        {
-            CheckUpdates();
-            myTarget.MainGauge();
-            myTarget.RequiredGauge();
-        }
 
         SerializedProperty barSets_p = serializedObject.FindProperty("barSets");
         GUILayout.BeginHorizontal();
@@ -70,9 +62,14 @@ public class EnergyGaugeUIEditor : Editor
                 bleedImg_p.objectReferenceValue = null;
 
                 serializedObject.ApplyModifiedProperties();
+
+                    CheckUpdates();
+                myTarget.MainGauge();
+                myTarget.RequiredGauge();
+                HideGos();
             }
         }
-        if (barSets_p.arraySize > 1) GUI.enabled = true;
+        if (barSets_p.arraySize > 0) GUI.enabled = true;
         else GUI.enabled = false;
         if (GUILayout.Button("- Notch"))
         {
@@ -89,65 +86,39 @@ public class EnergyGaugeUIEditor : Editor
                 SerializedProperty mask_p = barSets_p.GetArrayElementAtIndex(id).FindPropertyRelative("mask");
                 if (mask_p.objectReferenceValue != null)
                 {
-                    GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(((Image)mask_p.objectReferenceValue).gameObject);
-                   if (prefab != null) Undo.DestroyObjectImmediate(prefab);
-                    else
-                    {
-                        GameObject go = ((Image)mask_p.objectReferenceValue).gameObject;
-                        Undo.DestroyObjectImmediate(go);
-                    }
+                    DestroyGo(((Image)mask_p.objectReferenceValue).gameObject);
                 }
 
                 SerializedProperty img_p = barSets_p.GetArrayElementAtIndex(id).FindPropertyRelative("img");
                 if (img_p.objectReferenceValue != null)
                 {
-                    GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(((Image)img_p.objectReferenceValue).gameObject);
-                    if (prefab != null) Undo.DestroyObjectImmediate(prefab);
-                    else
-                    {
-                        GameObject go = ((Image)img_p.objectReferenceValue).gameObject;
-                        Undo.DestroyObjectImmediate(go);
-                    }
-
+                    DestroyGo(((Image)img_p.objectReferenceValue).gameObject);
                 }
 
                 SerializedProperty requiredImg_p = barSets_p.GetArrayElementAtIndex(id).FindPropertyRelative("requiredImg");
                 if (requiredImg_p.objectReferenceValue != null)
                 {
-                    GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(((Image)requiredImg_p.objectReferenceValue).gameObject);
-                    if (prefab != null) Undo.DestroyObjectImmediate(prefab);
-                    else
-                    {
-                         GameObject go = ((Image)requiredImg_p.objectReferenceValue).gameObject;
-                         Undo.DestroyObjectImmediate(go);
-                    }
+                    DestroyGo(((Image)requiredImg_p.objectReferenceValue).gameObject);
                 }
                 SerializedProperty requiredMask_p = barSets_p.GetArrayElementAtIndex(id).FindPropertyRelative("requiredMask");
                 if (requiredMask_p.objectReferenceValue != null)
                 {
-                    GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(((Image)requiredMask_p.objectReferenceValue).gameObject);
-                    if (prefab != null) Undo.DestroyObjectImmediate(prefab);
-                    else
-                    {
-                        GameObject go = ((Image)requiredMask_p.objectReferenceValue).gameObject;
-                         Undo.DestroyObjectImmediate(go);
-                    }
+                    DestroyGo(((Image)requiredMask_p.objectReferenceValue).gameObject);
                 }
 
                 SerializedProperty bleedImg_p = barSets_p.GetArrayElementAtIndex(id).FindPropertyRelative("bleedImg");
                 if (bleedImg_p.objectReferenceValue != null)
                 {
-                    GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(((Image)bleedImg_p.objectReferenceValue).gameObject);
-                    if (prefab != null) Undo.DestroyObjectImmediate(prefab);
-                    else
-                    {
-                        GameObject go = ((Image)bleedImg_p.objectReferenceValue).gameObject;
-                         Undo.DestroyObjectImmediate(go);
-                    }
+                    DestroyGo(((Image)bleedImg_p.objectReferenceValue).gameObject);
                 }
 ;
                 barSets_p.DeleteArrayElementAtIndex(barSets_p.arraySize - 1);
                 serializedObject.ApplyModifiedProperties();
+
+                CheckUpdates();
+                myTarget.MainGauge();
+                myTarget.RequiredGauge();
+                HideGos();
             }
         }
         GUI.enabled = true;
@@ -159,6 +130,16 @@ public class EnergyGaugeUIEditor : Editor
         showDebug = GUILayout.Toggle(showDebug,"show debug");
 
           base.OnInspectorGUI();
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            HideGos();
+            serializedProperty_current.intValue = preCurrent;
+        }
+        myTarget.MainGauge();
+        myTarget.RequiredGauge();
+
+        serializedObject.ApplyModifiedProperties();
     }
     void LegacySetup()
     {
@@ -204,8 +185,6 @@ public class EnergyGaugeUIEditor : Editor
 
         myTarget = (EnergyGaugeUI)target;
 
-        myTarget.ConsistentPosSize();
-
         for (int i = 0; i < myTarget.barSets.Count; i++)
         {
             SerializedProperty new_mask_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("mask");
@@ -213,10 +192,13 @@ public class EnergyGaugeUIEditor : Editor
             SerializedProperty new_requiredMask_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("requiredMask");
             SerializedProperty new_required_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("requiredImg");
 
-            if (myTarget.barSets[i].mask == null)
+            if (new_mask_p.objectReferenceValue == null) //mask
             {
+                serializedObject.Update();
                 GameObject _mask = new GameObject("Mask_" + i);
-                _mask.transform.SetParent(myTarget.transform);
+                //_mask.transform.SetParent(myTarget.transform);
+                ParentGo(_mask.gameObject , myTarget.gameObject);
+
                 Image _maskImg = _mask.AddComponent<Image>();
                 Mask _mc = _mask.AddComponent<Mask>();
                 _mc.showMaskGraphic = false;
@@ -225,60 +207,68 @@ public class EnergyGaugeUIEditor : Editor
                 new_mask_p.objectReferenceValue = _maskImg;
 
                 Undo.RegisterCreatedObjectUndo(_mask, "create GO");
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
                 // Undo.RecordObject(target, "Setup");
             }
-            else
-            {
+
                 if (myTarget.showMask)
                 {
-                    ((Image)new_mask_p.objectReferenceValue).enabled = true;
+                    myTarget.barSets[i].mask.enabled = true;
                     if (myTarget.maskImg != null) ((Image)new_mask_p.objectReferenceValue).sprite = myTarget.maskImg;
                     ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = myTarget.showMaskGraphic;
                     //myTarget.barSets[i].mask.enabled = true;
                     // if (myTarget.maskImg != null) myTarget.barSets[i].mask.sprite = myTarget.maskImg;
-                   // myTarget.barSets[i].mask.GetComponent<Mask>().showMaskGraphic = myTarget.showMaskGraphic;
+                    // myTarget.barSets[i].mask.GetComponent<Mask>().showMaskGraphic = myTarget.showMaskGraphic;
 
                 }
                 else
                 {
-                    if (myTarget.barSets[i].mask.enabled)
+                    if (((Image)new_mask_p.objectReferenceValue).enabled)
                     {
                         ((Image)new_mask_p.objectReferenceValue).enabled = false;
                         if (myTarget.maskImg != null) ((Image)new_mask_p.objectReferenceValue).sprite = null;
                         ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = false;
-                       // myTarget.barSets[i].mask.enabled = false;
-                       // myTarget.barSets[i].mask.sprite = null;
+                        // myTarget.barSets[i].mask.enabled = false;
+                        // myTarget.barSets[i].mask.sprite = null;
                         //myTarget.barSets[i].mask.GetComponent<Mask>().showMaskGraphic = false;
                     }
                 }
-                HideGO(myTarget.barSets[i].mask.gameObject);
+            
 
-                if (myTarget.barSets[i].img == null)
+            if (new_img_p.objectReferenceValue == null) //img bar
                 {
-                    Debug.Log("create main guage");
+                serializedObject.Update();
+               // Debug.Log("create main guage");
                     GameObject _gauge = new GameObject("mainGauge_" + i);
-                    _gauge.transform.SetParent(myTarget.barSets[i].mask.transform);
+
+                    ParentGo(_gauge.gameObject, myTarget.barSets[i].mask.gameObject);
+                   // _gauge.transform.SetParent(myTarget.barSets[i].mask.transform);
                     Image _img = _gauge.AddComponent<Image>();
 
                     //myTarget.barSets[i].img = _img;
                     new_img_p.objectReferenceValue = _img;
-                    Undo.RegisterCreatedObjectUndo(_gauge, "create GO");
-                }
-                else //has
-                {
-                    if (myTarget.barImg != null) ((Image)new_img_p.objectReferenceValue).sprite = myTarget.barImg;
 
-                    HideGO(myTarget.barSets[i].img.gameObject);
-                }
+                    Undo.RegisterCreatedObjectUndo(_gauge, "create GO");
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
+            }
+
+                    if (myTarget.barImg != null) ((Image)new_img_p.objectReferenceValue).sprite = myTarget.barImg;
+                
 
 
                 if (myTarget.canRequired)
                 {
                     //mask
-                    if (myTarget.barSets[i].requiredMask == null)
+                    if (new_requiredMask_p.objectReferenceValue == null)
                     {
-                        GameObject _mask = new GameObject("RequiredMask_" + i);
-                        _mask.transform.SetParent(myTarget.barSets[i].mask.transform);
+                    serializedObject.Update();
+                    GameObject _mask = new GameObject("RequiredMask_" + i);
+    
+                        ParentGo(_mask.gameObject, myTarget.barSets[i].mask.gameObject);
+                       // _mask.transform.SetParent(myTarget.barSets[i].mask.transform);
+
                         Image _maskImg = _mask.AddComponent<Image>();
                         Mask _mc = _mask.AddComponent<Mask>();
                         _mc.showMaskGraphic = false;
@@ -287,50 +277,45 @@ public class EnergyGaugeUIEditor : Editor
                         new_requiredMask_p.objectReferenceValue = _maskImg;
 
                         Undo.RegisterCreatedObjectUndo(_mask, "create GO");
-                   //     Undo.RecordObject(target, "Setup");
-                    }
-                    else
-                    {
+                    //     Undo.RecordObject(target, "Setup");
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                }
                         //has
                         ((Image)new_requiredMask_p.objectReferenceValue).sprite = myTarget.maskImg;
                         //myTarget.barSets[i].requiredMask.sprite = myTarget.barSets[i].img.sprite;
 
-                        HideGO(myTarget.barSets[i].requiredMask.gameObject);
-                    }
                     //guage
-                    if (myTarget.barSets[i].requiredImg == null)
+                    if (new_required_p.objectReferenceValue == null)
                     {
-                        Image requiredImg = Instantiate((Image)new_img_p.objectReferenceValue, ((Image)new_requiredMask_p.objectReferenceValue).transform);
+                    serializedObject.Update();
+                    Image requiredImg = Instantiate((Image)new_img_p.objectReferenceValue, ((Image)new_requiredMask_p.objectReferenceValue).transform);
                         requiredImg.name = "Required_" + i;
-                        requiredImg.transform.SetParent(((Image)new_requiredMask_p.objectReferenceValue).transform);
+
+                        ParentGo(requiredImg.gameObject, ((Image)new_requiredMask_p.objectReferenceValue).gameObject);
+                        //requiredImg.transform.SetParent(((Image)new_requiredMask_p.objectReferenceValue).transform);
 
                         new_required_p.objectReferenceValue = requiredImg;
                         Undo.RegisterCreatedObjectUndo(requiredImg, "create GO");
-                    }
-                    else
-                    {
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                }
                         //has
                         ((Image)new_required_p.objectReferenceValue).sprite = myTarget.barImg;
                         ((Image)new_required_p.objectReferenceValue).transform.SetParent(((Image)new_requiredMask_p.objectReferenceValue).transform);
                         //myTarget.barSets[i].requiredImg.sprite = myTarget.barSets[i].img.sprite;
                         // myTarget.barSets[i].requiredImg.transform.SetParent(    ((Image)new_requiredMask_p.objectReferenceValue).transform  );
 
-                        HideGO(myTarget.barSets[i].requiredImg.gameObject);
-                    }
                 }
                 else
                 {
                     if (myTarget.barSets[i].requiredImg != null)
                     {
-                        GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(myTarget.barSets[i].requiredImg.gameObject);
-                        if (prefab != null) Undo.DestroyObjectImmediate(prefab);
-                        else Undo.DestroyObjectImmediate(myTarget.barSets[i].requiredImg.gameObject);
+                        DestroyGo(myTarget.barSets[i].requiredImg.gameObject);
                     }
                     if (myTarget.barSets[i].requiredMask != null)
                     {
-                        GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(myTarget.barSets[i].requiredMask.gameObject);
-                        if (prefab != null) Undo.DestroyObjectImmediate(prefab);
-                        else Undo.DestroyObjectImmediate(myTarget.barSets[i].requiredMask.gameObject);
+                        DestroyGo(myTarget.barSets[i].requiredMask.gameObject);
                     }
                 }
 
@@ -338,23 +323,54 @@ public class EnergyGaugeUIEditor : Editor
                 {
                     myTarget.DisplayLogic();
                 }
-            }
+            
         }
+        myTarget.ConsistentPosSize();
+
         serializedObject.ApplyModifiedProperties();
+
     }
     bool showDebug;
+    void HideGos()
+    {
+        for (int i = 0; i < myTarget.barSets.Count; i++)
+        {
+           if (myTarget.barSets[i].img) HideGO(myTarget.barSets[i].img.gameObject);
+            if (myTarget.barSets[i].mask) HideGO(myTarget.barSets[i].mask.gameObject);
+            if (myTarget.barSets[i].bleedImg) HideGO(myTarget.barSets[i].bleedImg.gameObject);
+            if (myTarget.barSets[i].requiredImg) HideGO(myTarget.barSets[i].requiredImg.gameObject);
+            if (myTarget.barSets[i].requiredMask) HideGO(myTarget.barSets[i].requiredMask.gameObject);
+        }
+    }
     void HideGO(GameObject _go)
     {
+        if (_go == null) return;
+
+            GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(_go);
+            if (!showDebug)
+            {
+                if (prefab != null) prefab.hideFlags = HideFlags.HideAndDontSave;
+                else _go.hideFlags = HideFlags.HideAndDontSave;
+            }
+            else
+            {
+                if (prefab != null) prefab.hideFlags = HideFlags.DontSave;
+                else _go.hideFlags = HideFlags.DontSave;
+            }
+            EditorApplication.DirtyHierarchyWindowSorting();
+        
+    }
+    void ParentGo(GameObject _go, GameObject _parentGo )
+    {
+        //GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(_parentGo);
+        //if (prefab != null) _go.transform.SetParent(prefab.transform);
+        //else 
+            _go.transform.SetParent(_parentGo.transform);
+    }
+    void DestroyGo(GameObject _go)
+    {
         GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(_go);
-        if (!showDebug)
-        {
-            if (prefab != null) prefab.hideFlags = HideFlags.HideAndDontSave;
-            else _go.hideFlags = HideFlags.HideAndDontSave;
-        }
-        else
-        {
-            if (prefab != null) prefab.hideFlags = HideFlags.DontSave;
-            else _go.hideFlags = HideFlags.DontSave;
-        }
+        if (prefab != null) Undo.DestroyObjectImmediate(prefab);
+        else Undo.DestroyObjectImmediate(_go);
     }
 }
