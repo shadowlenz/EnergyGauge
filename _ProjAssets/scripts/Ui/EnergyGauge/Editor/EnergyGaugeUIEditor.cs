@@ -13,14 +13,13 @@ public class EnergyGaugeUIEditor : Editor
         myTarget = (EnergyGaugeUI)target;
         if (!Application.isPlaying)
         {
-            // /  LegacySetup();
-
+            /*
             Transform[] _tr = myTarget.transform.GetComponentsInChildren<Transform>();
             for (int i = 0; i < _tr.Length; i++)
             {
                 if (_tr[i] != null && _tr[i] != myTarget.transform ) DestroyImmediate(_tr[i].gameObject);
             }
-
+            */
             CheckUpdates();
             HideGos();
         }
@@ -35,16 +34,32 @@ public class EnergyGaugeUIEditor : Editor
         SerializedProperty serializedProperty_current = serializedObject.FindProperty("current");
         SerializedProperty serializedProperty_max = serializedObject.FindProperty("max");
 
-         EditorGUI.BeginChangeCheck();
+        EditorGUI.BeginChangeCheck();
+        showDebug = GUILayout.Toggle(showDebug, "show debug");
+        if (EditorGUI.EndChangeCheck())
+        {
+            HideGos();
+        }
+        GUILayout.Space(20);
+        EditorGUI.BeginChangeCheck();
+
         int preCurrent = serializedProperty_current.intValue;
         GUILayout.BeginHorizontal();
         preCurrent = EditorGUILayout.IntSlider(preCurrent, 0, serializedProperty_max.intValue);
+
         if (EditorGUI.EndChangeCheck())
         {
-            CheckUpdates();
-            // HideGos();
             serializedProperty_current.intValue = preCurrent;
         }
+
+
+        //call this if inspector changed
+
+        CheckUpdates();
+
+
+
+
         //serializedProperty_current.intValue = preCurrent;
         EditorGUILayout.LabelField(" / " + serializedProperty_max.intValue, GUILayout.Width(80));
         GUILayout.EndHorizontal();
@@ -148,7 +163,6 @@ public class EnergyGaugeUIEditor : Editor
         GUILayout.EndHorizontal();
         GUILayout.Space(20);
 
-        showDebug = GUILayout.Toggle(showDebug,"show debug");
 
           base.OnInspectorGUI();
 
@@ -197,18 +211,19 @@ public class EnergyGaugeUIEditor : Editor
 
         serializedObject.ApplyModifiedProperties();
     }*/
+
     void CheckUpdates()
     {
-        SerializedObject serializedObject = new SerializedObject(target);
+      //  SerializedObject serializedObject = new SerializedObject(target);
         SerializedProperty barSets_p = serializedObject.FindProperty("barSets");
-        serializedObject.Update();
+
 
         myTarget = (EnergyGaugeUI)target;
 
         for (int i = 0; i < myTarget.barSets.Count; i++)
         {
-
             serializedObject.Update();
+
             SerializedProperty new_mask_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("mask");
             SerializedProperty new_img_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("img");
             SerializedProperty new_requiredMask_p = barSets_p.GetArrayElementAtIndex(i).FindPropertyRelative("requiredMask");
@@ -217,7 +232,7 @@ public class EnergyGaugeUIEditor : Editor
 
             if (new_mask_p.objectReferenceValue == null) //mask
             {
-                serializedObject.Update();
+    
                 GameObject _mask = new GameObject("Mask_" + i);
                 //_mask.transform.SetParent(myTarget.transform);
                 HideGO(_mask);
@@ -231,29 +246,29 @@ public class EnergyGaugeUIEditor : Editor
                 new_mask_p.objectReferenceValue = _maskImg;
 
                 serializedObject.ApplyModifiedProperties();
-                serializedObject.Update();
+  
                 Debug.Log("making mask");
             }
 
             if (myTarget.showMask)
                 {
-                if (!((Image)new_mask_p.objectReferenceValue).enabled)
-                {
+               // if (!((Image)new_mask_p.objectReferenceValue).enabled)
+               // {
                     ((Image)new_mask_p.objectReferenceValue).enabled = true;
                     ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = myTarget.showMaskGraphic;
 
                     serializedObject.ApplyModifiedProperties();
-                    serializedObject.Update();
-                }
+             
+                //}
                 if (myTarget.maskImg != null)
-                {
+                //{
                     if (((Image)new_mask_p.objectReferenceValue).sprite != myTarget.maskImg)
                     {
                         ((Image)new_mask_p.objectReferenceValue).sprite = myTarget.maskImg;
                         serializedObject.ApplyModifiedProperties();
-                        serializedObject.Update();
+                        
                     }
-                }
+               // }
             }
             else
             {
@@ -264,7 +279,7 @@ public class EnergyGaugeUIEditor : Editor
                     ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = false;
 
                     serializedObject.ApplyModifiedProperties();
-                    serializedObject.Update();
+                   
                 }
                     
             }
@@ -272,7 +287,7 @@ public class EnergyGaugeUIEditor : Editor
 
             if (new_img_p.objectReferenceValue == null) //img bar
                 {
-                serializedObject.Update();
+                
                // Debug.Log("create main guage");
                     GameObject _gauge = new GameObject("mainGauge_" + i);
                 HideGO(_gauge);
@@ -285,18 +300,18 @@ public class EnergyGaugeUIEditor : Editor
 
                     //Undo.RegisterCreatedObjectUndo(_gauge, "create GO");
                 serializedObject.ApplyModifiedProperties();
-                serializedObject.Update();
+             
             }
 
             if (myTarget.barImg != null)
             {
-                if (((Image)new_img_p.objectReferenceValue).sprite != myTarget.barImg)
-                {
+                //if (((Image)new_img_p.objectReferenceValue).sprite != myTarget.barImg)
+                //{
                     ((Image)new_img_p.objectReferenceValue).sprite = myTarget.barImg;
 
                     serializedObject.ApplyModifiedProperties();
-                    serializedObject.Update();
-                }
+               
+               // }
             }
                 
 
@@ -306,7 +321,7 @@ public class EnergyGaugeUIEditor : Editor
                 //mask
                 if (new_requiredMask_p.objectReferenceValue == null)
                 {
-                serializedObject.Update();
+              
                 GameObject _mask = new GameObject("RequiredMask_" + i);
                     HideGO(_mask);
                     ParentGo(_mask.gameObject, myTarget.barSets[i].mask.gameObject);
@@ -322,24 +337,24 @@ public class EnergyGaugeUIEditor : Editor
                // Undo.RegisterCreatedObjectUndo(_mask, "create GO");
  
                 serializedObject.ApplyModifiedProperties();
-                serializedObject.Update();
+              
             }
                 //has
                 if (myTarget.maskImg != null)
                 {
-                    if (((Image)new_requiredMask_p.objectReferenceValue).sprite != myTarget.maskImg)
-                    {
+                   // if (((Image)new_requiredMask_p.objectReferenceValue).sprite != myTarget.maskImg)
+                   // {
                         ((Image)new_requiredMask_p.objectReferenceValue).sprite = myTarget.maskImg;                    //myTarget.barSets[i].requiredMask.sprite = myTarget.barSets[i].img.sprite;
 
                         serializedObject.ApplyModifiedProperties();
-                        serializedObject.Update();
-                    }
+                        
+                   // }
                 }
 
                 //guage
                 if (new_required_p.objectReferenceValue == null)
                 {
-                    serializedObject.Update();
+                   
                     Image requiredImg = Instantiate((Image)new_img_p.objectReferenceValue, ((Image)new_requiredMask_p.objectReferenceValue).transform);
                     requiredImg.name = "Required_" + i;
                     HideGO(requiredImg.gameObject);
@@ -350,18 +365,18 @@ public class EnergyGaugeUIEditor : Editor
 
                     //Undo.RegisterCreatedObjectUndo(requiredImg, "create GO");
                         serializedObject.ApplyModifiedProperties();
-                        serializedObject.Update();
+                     
                 }
                 //has
                 if (myTarget.barImg != null)
                 {
-                    if (((Image)new_required_p.objectReferenceValue).sprite != myTarget.barImg)
-                    {
+                    //if (((Image)new_required_p.objectReferenceValue).sprite != myTarget.barImg)
+                    //{
                         ((Image)new_required_p.objectReferenceValue).sprite = myTarget.barImg;
 
                         serializedObject.ApplyModifiedProperties();
-                        serializedObject.Update();
-                    }
+                       
+                    //}
                 }
 
             }
@@ -386,7 +401,7 @@ public class EnergyGaugeUIEditor : Editor
         myTarget.ConsistentPosSize();
 
         serializedObject.ApplyModifiedProperties();
-
+       
     }
     bool showDebug;
     void HideGos()
@@ -402,19 +417,22 @@ public class EnergyGaugeUIEditor : Editor
     }
     void HideGO(GameObject _go)
     {
+        
         if (_go == null) return;
 
             GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(_go);
             if (!showDebug)
             {
-                if (prefab != null) prefab.hideFlags = HideFlags.HideAndDontSave;
-                else _go.hideFlags = HideFlags.HideAndDontSave;
-            }
+               // if (prefab != null) prefab.hideFlags = HideFlags.HideAndDontSave;
+               // else _go.hideFlags = HideFlags.HideAndDontSave;
+           _go.hideFlags = HideFlags.HideInHierarchy;
+        }
             else
             {
-                if (prefab != null) prefab.hideFlags = HideFlags.DontSave;
-                else _go.hideFlags = HideFlags.DontSave;
-            }
+            // if (prefab != null) prefab.hideFlags = HideFlags.DontSave;
+            // else _go.hideFlags = HideFlags.DontSave;
+          _go.hideFlags = HideFlags.None;
+        }
             EditorApplication.DirtyHierarchyWindowSorting();
         
     }
