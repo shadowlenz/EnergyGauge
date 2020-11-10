@@ -509,6 +509,7 @@ public class EnergyGaugeUI : MonoBehaviour
         {
             barSets[ID].bleedImg = Instantiate(barSets[ID].img);
             barSets[ID].bleedImg.transform.SetParent(barSets[ID].img.transform.parent);
+            barSets[ID].bleedImg.rectTransform.localScale = Vector3.one;
             barSets[ID].bleedImg.name = "Bleed_" + ID;
             barSets[ID].bleedImg.sprite = barImg;
 
