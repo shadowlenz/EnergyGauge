@@ -94,6 +94,18 @@ public class EnergyGaugeUIEditor : Editor
                 serializedObject.ApplyModifiedProperties();
 
                 CheckUpdates();
+
+                serializedObject.Update();
+
+                //adjust
+                RectTransform thisRt = myTarget.GetComponent<RectTransform>();
+                RectTransform _rt = ((Image)mask_p.objectReferenceValue).rectTransform;
+                _rt.anchorMin = thisRt.anchorMin;
+                _rt.anchorMax = thisRt.anchorMax;
+                _rt.pivot = thisRt.pivot;
+                _rt.anchoredPosition = new Vector2((myTarget.barSets.Count-1) * myTarget.size.x, 0);
+                
+
                 myTarget.MainGauge();
                 myTarget.RequiredGauge();
                 HideGos();
@@ -233,11 +245,11 @@ public class EnergyGaugeUIEditor : Editor
 
             if (new_mask_p.objectReferenceValue == null) //mask
             {
-    
+
                 GameObject _mask = new GameObject("Mask_" + i);
                 //_mask.transform.SetParent(myTarget.transform);
                 HideGO(_mask);
-                ParentGo(_mask.gameObject , myTarget.gameObject);
+                ParentGo(_mask.gameObject, myTarget.gameObject);
 
                 Image _maskImg = _mask.AddComponent<Image>();
                 Mask _mc = _mask.AddComponent<Mask>();
@@ -246,26 +258,29 @@ public class EnergyGaugeUIEditor : Editor
                 //myTarget.barSets[i].mask = _maskImg;
                 new_mask_p.objectReferenceValue = _maskImg;
 
+                _mc.enabled = myTarget.showMask;
+                _mc.showMaskGraphic = myTarget.showMaskGraphic;
+
+                _maskImg.sprite = myTarget.maskImg;
+
                 serializedObject.ApplyModifiedProperties();
-  
+
                 Debug.Log("making mask");
             }
-
-            ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().enabled = myTarget.showMask;
-            ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>().showMaskGraphic = myTarget.showMaskGraphic;
-
-            serializedObject.ApplyModifiedProperties();
-
-            // if (myTarget.maskImg != null)
-            //    {
-            if (((Image)new_mask_p.objectReferenceValue).sprite != myTarget.maskImg)
+            else
             {
+
+
+                Mask mask = ((Image)new_mask_p.objectReferenceValue).GetComponent<Mask>();
+
+                mask.enabled = myTarget.showMask;
+                mask.showMaskGraphic = myTarget.showMaskGraphic;
+
                 ((Image)new_mask_p.objectReferenceValue).sprite = myTarget.maskImg;
                 serializedObject.ApplyModifiedProperties();
 
             }
-            // }
-
+            
 
             if (new_img_p.objectReferenceValue == null) //img bar
                 {
