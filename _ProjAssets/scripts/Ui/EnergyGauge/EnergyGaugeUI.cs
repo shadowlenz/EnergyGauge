@@ -1,7 +1,7 @@
 ﻿///written by: Eugene Chu
 ///https://twitter.com/LenZ_Chu
 ///free to use. please credit
-//v.5.1
+//v.5.2
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -57,6 +57,7 @@ public class EnergyGaugeUI : MonoBehaviour
     public bool canBleed = true;
     public Color bleedColor = Color.red;
     public float bleedPause = 1;
+    public float bleedSpeed = 1;
     //debug
     float _bleedPause;
     float oldPercentage = -1;
@@ -195,8 +196,8 @@ public class EnergyGaugeUI : MonoBehaviour
             }
             else
             {
-                float _speed = 3;
-                if (Percentage == 0 ) _speed = 10; //death
+                float _speed = bleedSpeed;
+                if (Percentage == 0 ) _speed = bleedSpeed*3; //death
 
                 if (barSets[i].bleedPercCheckPoint > barSets[i].perPerc)
                 {
