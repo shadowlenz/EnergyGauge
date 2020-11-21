@@ -425,7 +425,11 @@ public class EnergyGaugeUI : MonoBehaviour
     }
     public void SetValueMax(int _max)
     {
-        max = _max;
+        if (max != _max)
+        {
+            hasChanged = true;
+            max = _max;
+        }
     }
     //runtime replace
     public void AddNotch()
