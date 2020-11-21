@@ -107,7 +107,7 @@ public class EnergyGaugeUI : MonoBehaviour
             CreateRequiredBar(i);
             CreateBleedBar(i);
         }
-
+        hasChanged = true;
     }
     // Update is called once per frame
     void Update()
@@ -117,7 +117,11 @@ public class EnergyGaugeUI : MonoBehaviour
         BleedGauge();
         RequiredGauge();
         BlinkLogic();
-        DisplayLogic();
+        if (hasChanged)
+        {
+            DisplayLogic();
+            hasChanged = false;
+        }
     }
 
     public void MainGauge()
@@ -409,11 +413,15 @@ public class EnergyGaugeUI : MonoBehaviour
 
         }
     }
-
+    bool hasChanged = false;
     /////public////
    public void SetValueCurrent(int _current)
     {
-      current =  _current;
+        if (current != _current)
+        {
+            hasChanged = true;
+            current = _current;
+        }
     }
     public void SetValueMax(int _max)
     {

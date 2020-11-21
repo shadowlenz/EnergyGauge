@@ -384,12 +384,13 @@ public class EnergyGaugeUIEditor : Editor
                 ((Image)new_requiredMask_p.objectReferenceValue).enabled = false;
                 ((Image)new_required_p.objectReferenceValue).enabled = false;
             }
-
+            if (!Application.isPlaying)
+            {
                 if (myTarget.displayText != null || myTarget.displayTextTMP != null)
                 {
                     myTarget.DisplayLogic();
                 }
-
+            }
         }
         myTarget.ConsistentPosSize();
 
