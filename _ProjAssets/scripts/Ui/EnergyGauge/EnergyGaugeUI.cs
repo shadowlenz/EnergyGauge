@@ -1,7 +1,7 @@
 ﻿///written by: Eugene Chu
 ///https://twitter.com/LenZ_Chu
 ///free to use. please credit
-//v.5.2
+//v.5.3
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -144,7 +144,8 @@ public class EnergyGaugeUI : MonoBehaviour
             else if (barType == BarType.Scale) barSets[i].img.rectTransform.sizeDelta = size * barSets[i].perPerc;
         }
     }
-
+    [Header("runtime")]
+    public bool bleedGauge_SnapToCurrentValue;
     void BleedGauge()
     {
         if (!canBleed)
@@ -203,7 +204,7 @@ public class EnergyGaugeUI : MonoBehaviour
                 float _speed = bleedSpeed;
                 if (Percentage == 0 ) _speed = bleedSpeed*3; //death
 
-                if (barSets[i].bleedPercCheckPoint > barSets[i].perPerc)
+                if (barSets[i].bleedPercCheckPoint > barSets[i].perPerc && !bleedGauge_SnapToCurrentValue)
                 {
                     if (_bleedPause <= 0)
                     {
@@ -220,7 +221,7 @@ public class EnergyGaugeUI : MonoBehaviour
             if (barType == BarType.Fill)  barSets[i].bleedImg.fillAmount = barSets[i].bleedPercCheckPoint;
             else if (barType == BarType.Scale) barSets[i].bleedImg.rectTransform.sizeDelta = size * barSets[i].bleedPercCheckPoint;
         }
-       
+        bleedGauge_SnapToCurrentValue = false;
     }
 
 
