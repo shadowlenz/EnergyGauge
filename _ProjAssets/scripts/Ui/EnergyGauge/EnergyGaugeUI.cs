@@ -227,6 +227,10 @@ public class EnergyGaugeUI : MonoBehaviour
 
     public void RequiredGauge()
     {
+        for (int i = 0; i < barSets.Count; i++)
+        {
+            if (barSets[i].requiredImg != null) barSets[i].requiredMask.gameObject.SetActive(canRequired);
+        }
         if (!canRequired) return;
         //percent
         float perc = Percentage;
@@ -514,7 +518,7 @@ public class EnergyGaugeUI : MonoBehaviour
         if (barSets[ID].requiredMask != null)
         {
             barSets[ID].requiredMask.sprite = barImg;
-            barSets[ID].requiredMask.gameObject.SetActive(canRequired);
+           
             barSets[ID].requiredMask.GetComponent<RectTransform>().localScale = Vector3.one;
         }
 
@@ -530,7 +534,7 @@ public class EnergyGaugeUI : MonoBehaviour
         if (barSets[ID].requiredImg != null)
         {
             barSets[ID].requiredImg.sprite = barImg;
-            barSets[ID].requiredImg.gameObject.SetActive(canRequired);
+
             barSets[ID].requiredImg.GetComponent<RectTransform>().localScale = Vector3.one;
         }
 
