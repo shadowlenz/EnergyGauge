@@ -479,6 +479,7 @@ public class EnergyGaugeUI : MonoBehaviour
             Mask _mc = barSets[ID].mask.GetComponent<Mask>();
             _mc.enabled = showMask;
             _mc.showMaskGraphic = showMaskGraphic;
+            barSets[ID].mask.GetComponent<RectTransform>().localScale = Vector3.one;
         }
 
         if (barSets[ID].img == null)
@@ -493,6 +494,7 @@ public class EnergyGaugeUI : MonoBehaviour
         if (barSets[ID].img != null)
         {
             barSets[ID].img.sprite = barImg;
+            barSets[ID].img.GetComponent<RectTransform>().localScale = Vector3.one;
         }
     }
     public void CreateRequiredBar(int ID)
@@ -513,6 +515,7 @@ public class EnergyGaugeUI : MonoBehaviour
         {
             barSets[ID].requiredMask.sprite = barImg;
             barSets[ID].requiredMask.gameObject.SetActive(canRequired);
+            barSets[ID].requiredMask.GetComponent<RectTransform>().localScale = Vector3.one;
         }
 
         //guage
@@ -527,7 +530,8 @@ public class EnergyGaugeUI : MonoBehaviour
         if (barSets[ID].requiredImg != null)
         {
             barSets[ID].requiredImg.sprite = barImg;
-                barSets[ID].requiredImg.gameObject.SetActive(canRequired);
+            barSets[ID].requiredImg.gameObject.SetActive(canRequired);
+            barSets[ID].requiredImg.GetComponent<RectTransform>().localScale = Vector3.one;
         }
 
     }
@@ -543,6 +547,7 @@ public class EnergyGaugeUI : MonoBehaviour
             barSets[ID].bleedImg.sprite = barImg;
 
             barSets[ID].bleedImg.transform.SetSiblingIndex(0);
+            barSets[ID].bleedImg.GetComponent<RectTransform>().localScale = Vector3.one;
         }
 
     }
