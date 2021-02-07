@@ -98,7 +98,7 @@ public class EnergyGaugeUIEditor : Editor
                 serializedObject.Update();
 
                 //adjust
-                RectTransform thisRt =(RectTransform) myTarget.transform;
+               // RectTransform thisRt = myTarget.transform.GetComponent<RectTransform>();
                 RectTransform _rt = ((Image)mask_p.objectReferenceValue).rectTransform;
                // _rt.anchorMin = thisRt.anchorMin;
                // _rt.anchorMax = thisRt.anchorMax;
