@@ -98,13 +98,13 @@ public class EnergyGaugeUIEditor : Editor
                 serializedObject.Update();
 
                 //adjust
-                RectTransform thisRt = myTarget.GetComponent<RectTransform>();
+                RectTransform thisRt =(RectTransform) myTarget.transform;
                 RectTransform _rt = ((Image)mask_p.objectReferenceValue).rectTransform;
-                _rt.anchorMin = thisRt.anchorMin;
-                _rt.anchorMax = thisRt.anchorMax;
-                _rt.pivot = thisRt.pivot;
+               // _rt.anchorMin = thisRt.anchorMin;
+               // _rt.anchorMax = thisRt.anchorMax;
+                //_rt.pivot = thisRt.pivot;
                 _rt.anchoredPosition = new Vector2((myTarget.barSets.Count-1) * myTarget.size.x, 0);
-                
+                _rt.localScale = Vector3.one;
 
                 myTarget.MainGauge();
                 myTarget.RequiredGauge();

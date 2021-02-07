@@ -9,15 +9,15 @@ using UnityEngine.UI;
 using TMPro;
 public class EnergyGaugeUI : MonoBehaviour
 {
-    public int current=100;
-    public int max =100;
+    public int current = 100;
+    public int max = 100;
     [Header("Setup")]
     public bool showMask = true;
     public bool showMaskGraphic = true;
     public Sprite maskImg;
-    public Color maskCol = new Color(0,0,0,0.3f);
+    public Color maskCol = new Color(0, 0, 0, 0.3f);
     public Sprite barImg;
-    public Vector2 size = new Vector2(100,100);
+    public Vector2 size = new Vector2(100, 100);
     [Header("image Type")]
     public bool preserveAspect = true;
     public enum BarType { Fill, Scale }
@@ -66,7 +66,7 @@ public class EnergyGaugeUI : MonoBehaviour
     [Header("required")]
     public bool canRequired = true;
     public bool keepRequiredMaxOfCurrent;
-    public enum BehindAhead { Behind, Ahead}
+    public enum BehindAhead { Behind, Ahead }
     public BehindAhead behindAhead = BehindAhead.Behind;
 
     public int required = 10;
@@ -76,15 +76,15 @@ public class EnergyGaugeUI : MonoBehaviour
     [System.Serializable]
     public class BarSet
     {
-   
+
         public Image mask;
-  
+
         public Image img;
 
         public Image requiredMask;
- 
+
         public Image requiredImg;
-   
+
         public Image bleedImg;
         [System.NonSerialized]
         public float bleedPercCheckPoint;
@@ -135,7 +135,7 @@ public class EnergyGaugeUI : MonoBehaviour
 
         for (int i = 0; i < barSets.Count; i++)
         {
-            barSets[i].perPerc = Mathf.Clamp01 ((Percentage * barSets.Count) - i);
+            barSets[i].perPerc = Mathf.Clamp01((Percentage * barSets.Count) - i);
             if (barSets[i].img == null) return;
 
             barSets[i].img.color = _col;
@@ -184,7 +184,7 @@ public class EnergyGaugeUI : MonoBehaviour
         if (_bleedPause > 0 && !bleedOver) //RemainderRequired() required has num remained, inert this bleed logic
         {
             //pause time to see the bleed
-            _bleedPause = Mathf.Clamp01( _bleedPause- Time.unscaledDeltaTime);
+            _bleedPause = Mathf.Clamp01(_bleedPause - Time.unscaledDeltaTime);
         }
 
         for (int i = 0; i < barSets.Count; i++)
@@ -195,14 +195,14 @@ public class EnergyGaugeUI : MonoBehaviour
             barSets[i].bleedImg.sprite = barImg;
             barSets[i].bleedImg.color = bleedColor;
             //=================
-            if (i< barSets.Count-1 && barSets[i + 1].bleedPercCheckPoint > 0) //the other bars are still at full
+            if (i < barSets.Count - 1 && barSets[i + 1].bleedPercCheckPoint > 0) //the other bars are still at full
             {
                 barSets[i].bleedPercCheckPoint = 1;
             }
             else
             {
                 float _speed = bleedSpeed;
-                if (Percentage == 0 ) _speed = bleedSpeed*3; //death
+                if (Percentage == 0) _speed = bleedSpeed * 3; //death
 
                 if (barSets[i].bleedPercCheckPoint > barSets[i].perPerc && !bleedGauge_SnapToCurrentValue)
                 {
@@ -218,7 +218,7 @@ public class EnergyGaugeUI : MonoBehaviour
 
             }
             //========================
-            if (barType == BarType.Fill)  barSets[i].bleedImg.fillAmount = barSets[i].bleedPercCheckPoint;
+            if (barType == BarType.Fill) barSets[i].bleedImg.fillAmount = barSets[i].bleedPercCheckPoint;
             else if (barType == BarType.Scale) barSets[i].bleedImg.rectTransform.sizeDelta = size * barSets[i].bleedPercCheckPoint;
         }
         bleedGauge_SnapToCurrentValue = false;
@@ -236,7 +236,7 @@ public class EnergyGaugeUI : MonoBehaviour
             {
                 perc = Mathf.Max((float)required / (float)max, Percentage);
                 //BarType.Scale offset do it again
-                if (barType == BarType.Scale) perc = Mathf.Max((float)(required *2) / (float)max, Percentage);
+                if (barType == BarType.Scale) perc = Mathf.Max((float)(required * 2) / (float)max, Percentage);
             }
         }
         else if (behindAhead == BehindAhead.Ahead)
@@ -245,13 +245,13 @@ public class EnergyGaugeUI : MonoBehaviour
             //BarType.Scale offset do it again
             if (barType == BarType.Scale) perc += RequiredPercentage;
         }
-            //
+        //
 
 
         for (int i = 0; i < barSets.Count; i++)
         {
             //require mask
-            if (barSets[i].requiredMask != null) 
+            if (barSets[i].requiredMask != null)
             {
                 ReverseImg(barSets[i].requiredMask);
 
@@ -299,7 +299,8 @@ public class EnergyGaugeUI : MonoBehaviour
 
         if (Percentage <= percToBlink)
         {
-            if (_blinkLength <= 0) {
+            if (_blinkLength <= 0)
+            {
                 blinkOnOff = !blinkOnOff;
                 _blinkLength = blinkLength;
             }
@@ -315,16 +316,16 @@ public class EnergyGaugeUI : MonoBehaviour
     }
 
     public void DisplayLogic()
-    {   
+    {
         if (displayText == null && displayTextTMP == null) return;
         string parse = displayStyle;
 
-        parse= parse.Replace("[cur]", current.ToString());
-        parse= parse.Replace("[max]", max.ToString());
+        parse = parse.Replace("[cur]", current.ToString());
+        parse = parse.Replace("[max]", max.ToString());
         parse = parse.Replace("[req]", required.ToString());
-        parse = parse.Replace("[%]", ( Mathf.RoundToInt( Percentage * 100) ).ToString());
+        parse = parse.Replace("[%]", (Mathf.RoundToInt(Percentage * 100)).ToString());
 
-        if (displayText != null )  displayText.text = parse;
+        if (displayText != null) displayText.text = parse;
         if (displayTextTMP != null) displayTextTMP.text = parse;
     }
     public void ConsistentPosSize()
@@ -349,9 +350,9 @@ public class EnergyGaugeUI : MonoBehaviour
         if (canRequired)
         {
             if (behindAhead == BehindAhead.Behind && RequiredPercentage > Percentage) remainder = Percentage - RequiredPercentage;
-            if (behindAhead == BehindAhead.Ahead && (Percentage + RequiredPercentage) > 1) remainder = (Percentage + RequiredPercentage) -1;
+            if (behindAhead == BehindAhead.Ahead && (Percentage + RequiredPercentage) > 1) remainder = (Percentage + RequiredPercentage) - 1;
         }
-      // Debug.Log(remainder);
+        // Debug.Log(remainder);
         return remainder;
     }
     void SetupImg(Image img, bool ignoreImgTypeAndMethod = false)
@@ -416,7 +417,7 @@ public class EnergyGaugeUI : MonoBehaviour
     }
     bool hasChanged = false;
     /////public////
-   public void SetValueCurrent(int _current)
+    public void SetValueCurrent(int _current)
     {
         if (current != _current)
         {
@@ -456,7 +457,10 @@ public class EnergyGaugeUI : MonoBehaviour
     }
     public void CreateMainGuage(int ID)
     {
-        if (barSets[ID].mask == null)
+        RectTransform MainRt = (RectTransform)transform;// GetComponent<RectTransform>();
+
+        Image thisMask = barSets[ID].mask;
+        if (thisMask == null)
         {
             //mask
             GameObject _mask = new GameObject("Mask_" + ID);
@@ -464,14 +468,26 @@ public class EnergyGaugeUI : MonoBehaviour
             Image _maskImg = _mask.AddComponent<Image>();
             Mask _mc = _mask.AddComponent<Mask>();
 
-            _maskImg.enabled = showMask;
-            _maskImg.sprite = maskImg;
-            _mc.showMaskGraphic = showMaskGraphic;
-
-
             barSets[ID].mask = _maskImg;
+
+            RectTransform _thisRt = _mc.rectTransform;
+            _thisRt.localScale = Vector3.one;
+           // _thisRt.anchorMin = MainRt.anchorMin;
+           // _thisRt.anchorMax = MainRt.anchorMax;
+           //_thisRt.pivot = MainRt.pivot;
+
+
         }
-        if (barSets[ID].img == null)
+        if (thisMask != null)
+        {
+            thisMask.sprite = maskImg;
+            Mask _mc = thisMask.GetComponent<Mask>();
+            _mc.enabled = showMask;
+            _mc.showMaskGraphic = showMaskGraphic;
+        }
+
+        Image thisMainGauge = barSets[ID].img;
+        if (thisMainGauge == null)
         {
             GameObject _gauge = new GameObject("mainGauge_" + ID);
             _gauge.transform.SetParent(barSets[ID].mask.transform);
@@ -479,8 +495,6 @@ public class EnergyGaugeUI : MonoBehaviour
 
             barSets[ID].img = _img;
             barSets[ID].img.sprite = barImg;
-
-
         }
 
     }
@@ -517,7 +531,7 @@ public class EnergyGaugeUI : MonoBehaviour
         }
     }
 
-     public void CreateBleedBar(int ID)
+    public void CreateBleedBar(int ID)
     {
         if (canBleed && barSets[ID].img != null && barSets[ID].bleedImg == null)
         {
