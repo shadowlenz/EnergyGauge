@@ -457,11 +457,14 @@ public class EnergyGaugeUI : MonoBehaviour
     }
     public void CreateMainGuage(int ID)
     {
+        RectTransform mainRT = GetComponent<RectTransform>();
         if (barSets[ID].mask == null)
         {
             //mask
             GameObject _mask = new GameObject("Mask_" + ID);
+
             _mask.transform.SetParent(transform);
+
             Image _maskImg = _mask.AddComponent<Image>();
             Mask _mc = _mask.AddComponent<Mask>();
 
@@ -469,8 +472,6 @@ public class EnergyGaugeUI : MonoBehaviour
             // _thisRt.anchorMin = MainRt.anchorMin;
             // _thisRt.anchorMax = MainRt.anchorMax;
             //_thisRt.pivot = MainRt.pivot;
-
-
         }
         if (barSets[ID].mask != null)
         {
@@ -478,14 +479,12 @@ public class EnergyGaugeUI : MonoBehaviour
             Mask _mc = barSets[ID].mask.GetComponent<Mask>();
             _mc.enabled = showMask;
             _mc.showMaskGraphic = showMaskGraphic;
-
-            RectTransform thisRT = barSets[ID].mask.GetComponent<RectTransform>();
-            thisRT.localScale = Vector3.one;
         }
 
         if (barSets[ID].img == null)
         {
             GameObject _gauge = new GameObject("mainGauge_" + ID);
+
             _gauge.transform.SetParent(barSets[ID].mask.transform);
             Image _img = _gauge.AddComponent<Image>();
 
@@ -494,49 +493,43 @@ public class EnergyGaugeUI : MonoBehaviour
         if (barSets[ID].img != null)
         {
             barSets[ID].img.sprite = barImg;
-            RectTransform thisRT = barSets[ID].img.GetComponent<RectTransform>();
-            thisRT.localScale = Vector3.one;
         }
     }
     public void CreateRequiredBar(int ID)
     {
-        if (canRequired)
+
+        //mask
+        if (barSets[ID].requiredMask == null)
         {
-            //mask
-            if (barSets[ID].requiredMask == null)
-            {
-                GameObject _mask = new GameObject("RequiredMask_" + ID);
-                _mask.transform.SetParent(barSets[ID].mask.transform);
-                Image _maskImg = _mask.AddComponent<Image>();
-                Mask _mc = _mask.AddComponent<Mask>();
-                _mc.showMaskGraphic = false;
+            GameObject _mask = new GameObject("RequiredMask_" + ID);
+            _mask.transform.SetParent(barSets[ID].mask.transform);
+            Image _maskImg = _mask.AddComponent<Image>();
+            Mask _mc = _mask.AddComponent<Mask>();
+            _mc.showMaskGraphic = false;
 
-                barSets[ID].requiredMask = _maskImg;
-            }
-            if (barSets[ID].requiredMask != null)
-            {
-                barSets[ID].requiredMask.sprite = barImg;
-                RectTransform thisRT = barSets[ID].requiredMask.GetComponent<RectTransform>();
-                thisRT.localScale = Vector3.one;
-            }
-
-            //guage
-            if (barSets[ID].requiredImg == null)
-            {
-                Image requiredImg = Instantiate(barSets[ID].img.gameObject).GetComponent<Image>();
-                requiredImg.name = "Required_" + ID;
-                requiredImg.transform.SetParent(barSets[ID].requiredMask.transform);
-
-                barSets[ID].requiredImg = requiredImg;
-            }
-            if (barSets[ID].requiredImg != null)
-            {
-                barSets[ID].requiredImg.sprite = barImg;
-                RectTransform thisRT = barSets[ID].requiredImg.GetComponent<RectTransform>();
-                thisRT.localScale = Vector3.one;
-            }
-
+            barSets[ID].requiredMask = _maskImg;
         }
+        if (barSets[ID].requiredMask != null)
+        {
+            barSets[ID].requiredMask.sprite = barImg;
+            barSets[ID].requiredMask.gameObject.SetActive(canRequired);
+        }
+
+        //guage
+        if (barSets[ID].requiredImg == null)
+        {
+            Image requiredImg = Instantiate(barSets[ID].img.gameObject).GetComponent<Image>();
+            requiredImg.name = "Required_" + ID;
+            requiredImg.transform.SetParent(barSets[ID].requiredMask.transform);
+
+            barSets[ID].requiredImg = requiredImg;
+        }
+        if (barSets[ID].requiredImg != null)
+        {
+            barSets[ID].requiredImg.sprite = barImg;
+                barSets[ID].requiredImg.gameObject.SetActive(canRequired);
+        }
+
     }
 
     public void CreateBleedBar(int ID)
@@ -545,9 +538,6 @@ public class EnergyGaugeUI : MonoBehaviour
         {
             barSets[ID].bleedImg = Instantiate(barSets[ID].img);
             barSets[ID].bleedImg.transform.SetParent(barSets[ID].img.transform.parent);
-
-            RectTransform thisRT = barSets[ID].bleedImg.GetComponent<RectTransform>();
-            thisRT.localScale = Vector3.one;
 
             barSets[ID].bleedImg.name = "Bleed_" + ID;
             barSets[ID].bleedImg.sprite = barImg;

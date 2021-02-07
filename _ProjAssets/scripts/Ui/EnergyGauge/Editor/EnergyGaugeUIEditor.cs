@@ -335,11 +335,11 @@ public class EnergyGaugeUIEditor : Editor
               
                 }
                 //has
-                if (myTarget.maskImg != null)
+                if (myTarget.barImg != null)
                 {
                    // if (((Image)new_requiredMask_p.objectReferenceValue).sprite != myTarget.maskImg)
                    // {
-                        ((Image)new_requiredMask_p.objectReferenceValue).sprite = myTarget.maskImg;                    //myTarget.barSets[i].requiredMask.sprite = myTarget.barSets[i].img.sprite;
+                        ((Image)new_requiredMask_p.objectReferenceValue).sprite = myTarget.barImg;                    //myTarget.barSets[i].requiredMask.sprite = myTarget.barSets[i].img.sprite;
 
                         serializedObject.ApplyModifiedProperties();
                         
